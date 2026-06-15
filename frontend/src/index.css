@@ -1,0 +1,155 @@
+body {
+    margin: 0;
+    background-color: #f4f7fb;
+    font-family: Arial, sans-serif;
+    color: #10233f;
+}
+
+.app-layout {
+    display: flex;
+    min-height: 100vh;
+}
+
+.sidebar {
+    width: 240px;
+    background: linear-gradient(180deg, #073b66, #04243f);
+    color: white;
+    padding: 24px 18px;
+    flex-shrink: 0;
+}
+
+.sidebar-brand {
+    margin-bottom: 36px;
+}
+
+.sidebar-brand h4 {
+    margin: 0;
+    font-weight: bold;
+}
+
+.sidebar-brand span {
+    font-size: 13px;
+    color: #d7e6f5;
+}
+
+.sidebar-menu {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+.sidebar-menu a {
+    color: white;
+    text-decoration: none;
+    padding: 12px 14px;
+    border-radius: 8px;
+    font-size: 14px;
+    font-weight: 600;
+}
+
+.sidebar-menu a:hover {
+    background-color: #0d63b3;
+}
+
+.main-content {
+    flex: 1;
+    padding: 32px;
+}
+
+.page-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 24px;
+}
+
+.page-title {
+    color: #0b2f55;
+    font-weight: bold;
+    margin-bottom: 4px;
+}
+
+.page-subtitle {
+    color: #667085;
+    margin: 0;
+}
+
+.content-card {
+    background: white;
+    border-radius: 14px;
+    box-shadow: 0 4px 18px rgba(20, 50, 90, 0.08);
+    overflow: hidden;
+}
+
+.toolbar {
+    display: flex;
+    gap: 12px;
+    padding: 18px;
+    border-bottom: 1px solid #e5eaf0;
+}
+
+.table-clean {
+    margin: 0;
+}
+
+.table-clean thead th {
+    background-color: #f7f9fc;
+    color: #10233f;
+    font-size: 14px;
+    padding: 16px;
+}
+
+.table-clean tbody td {
+    padding: 16px;
+    vertical-align: middle;
+}
+
+.action-btn {
+    width: 34px;
+    height: 34px;
+    padding: 0;
+    font-size: 14px;
+}
+
+.table-footer {
+    padding: 16px 18px;
+    color: #667085;
+    border-top: 1px solid #e5eaf0;
+}
+
+.card {
+    border: none;
+    border-radius: 14px;
+    box-shadow: 0 4px 18px rgba(20, 50, 90, 0.08);
+}
+
+.btn {
+    border-radius: 8px;
+}
+
+.form-control,
+.form-select {
+    border-radius: 8px;
+}
+
+@media (max-width: 768px) {
+    .app-layout {
+        flex-direction: column;
+    }
+
+    .sidebar {
+        width: 100%;
+    }
+
+    .sidebar-menu {
+        flex-direction: row;
+        flex-wrap: wrap;
+    }
+
+    .page-header {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 12px;
+    }
+}
+
