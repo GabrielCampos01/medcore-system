@@ -1,4 +1,4 @@
-#TESTEEE
+# MedCore System
 
 Sistema Integrado de Gestão Hospitalar desenvolvido para a disciplina de Tecnologias para Internet.
 
@@ -249,12 +249,6 @@ Para rodar o backend em modo de desenvolvimento:
 
 ```bash
 npm run dev
-```
-
-Caso exista o script `start` configurado no `package.json`, também é possível executar:
-
-```bash
-npm start
 ```
 
 A API ficará disponível em:
