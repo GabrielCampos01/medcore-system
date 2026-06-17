@@ -217,13 +217,6 @@ Altere os valores conforme sua instalação do MySQL.
 
 ## Executando o Backend
 
-```bash
-npm start
-```
-
-ou
-
-```bash
 npm run dev
 ```
 
