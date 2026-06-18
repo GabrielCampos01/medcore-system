@@ -54,18 +54,49 @@ function cadastrarAtendimento(req, res) {
         valor
     } = req.body;
 
-    const sql = `
-        insert into atendimentos
-        (paciente_id, profissional_id, data_hora, tipo, status, diagnostico, observacoes, valor)
-        values (?, ?, ?, ?, ?, ?, ?, ?)
-    `;
-
     connection.query(
-        sql,
-        [paciente_id, profissional_id, data_hora, tipo, status, diagnostico, observacoes, valor],
-        (err) => {
-            if (err) return res.status(500).json({ erro: 'Erro ao cadastrar atendimento' });
-            res.status(201).json({ mensagem: 'Atendimento cadastrado com sucesso' });
+        'select ativo from profissionais where id = ?',
+        [profissional_id],
+        (err, results) => {
+            if (err) {
+                return res.status(500).json({
+                    erro: 'Erro ao verificar profissional'
+                });
+            }
+
+            if (results.length === 0) {
+                return res.status(404).json({
+                    erro: 'Profissional não encontrado'
+                });
+            }
+
+            if (results[0].ativo !== 1) {
+                return res.status(400).json({
+                    erro: 'Não é possível cadastrar atendimento com profissional inativo.'
+                });
+            }
+
+            const sql = `
+                insert into atendimentos
+                (paciente_id, profissional_id, data_hora, tipo, status, diagnostico, observacoes, valor)
+                values (?, ?, ?, ?, ?, ?, ?, ?)
+            `;
+
+            connection.query(
+                sql,
+                [paciente_id, profissional_id, data_hora, tipo, status, diagnostico, observacoes, valor],
+                (err) => {
+                    if (err) {
+                        return res.status(500).json({
+                            erro: 'Erro ao cadastrar atendimento'
+                        });
+                    }
+
+                    res.status(201).json({
+                        mensagem: 'Atendimento cadastrado com sucesso'
+                    });
+                }
+            );
         }
     );
 }
@@ -104,9 +135,28 @@ function atualizarAtendimento(req, res) {
 function excluirAtendimento(req, res) {
     const { id } = req.params;
 
-    connection.query('delete from atendimentos where id = ?', [id], (err) => {
-        if (err) return res.status(500).json({ erro: 'Erro ao excluir atendimento' });
-        res.status(200).json({ mensagem: 'Atendimento excluído com sucesso' });
+    const sql = `
+        update atendimentos
+        set status = 'Cancelado'
+        where id = ?
+    `;
+
+    connection.query(sql, [id], (err, results) => {
+        if (err) {
+            return res.status(500).json({
+                erro: 'Erro ao cancelar atendimento'
+            });
+        }
+
+        if (results.affectedRows === 0) {
+            return res.status(404).json({
+                erro: 'Atendimento não encontrado'
+            });
+        }
+
+        res.status(200).json({
+            mensagem: 'Atendimento cancelado com sucesso'
+        });
     });
 }
 

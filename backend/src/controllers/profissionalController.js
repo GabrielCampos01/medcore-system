@@ -1,5 +1,13 @@
 const connection = require('../config/db');
 
+function normalizarAtivo(ativo) {
+    if (ativo === true || ativo === 1 || ativo === '1' || ativo === 'true') {
+        return 1;
+    }
+
+    return 0;
+}
+
 function listarProfissionais(req, res) {
     connection.query(`
         select profissionais.*, especialidades.nome as especialidade
@@ -47,6 +55,8 @@ function cadastrarProfissional(req, res) {
         ativo
     } = req.body;
 
+    const ativoNormalizado = normalizarAtivo(ativo);
+
     const sql = `
         insert into profissionais
         (nome, crm_coren_crf, especialidade_id, cargo, turno, telefone, email, ativo)
@@ -55,7 +65,7 @@ function cadastrarProfissional(req, res) {
 
     connection.query(
         sql,
-        [nome, crm_coren_crf, especialidade_id, cargo, turno, telefone, email, ativo],
+        [nome, crm_coren_crf, especialidade_id, cargo, turno, telefone, email, ativoNormalizado],
         (err) => {
             if (err) {
                 if (err.code === 'ER_DUP_ENTRY') {
@@ -88,6 +98,8 @@ function atualizarProfissional(req, res) {
         ativo
     } = req.body;
 
+    const ativoNormalizado = normalizarAtivo(ativo);
+
     const sql = `
         update profissionais
         set nome = ?, crm_coren_crf = ?, especialidade_id = ?, cargo = ?,
@@ -97,10 +109,20 @@ function atualizarProfissional(req, res) {
 
     connection.query(
         sql,
-        [nome, crm_coren_crf, especialidade_id, cargo, turno, telefone, email, ativo, id],
-        (err) => {
+        [nome, crm_coren_crf, especialidade_id, cargo, turno, telefone, email, ativoNormalizado, id],
+        (err, results) => {
             if (err) {
+                if (err.code === 'ER_DUP_ENTRY') {
+                    return res.status(400).json({
+                        erro: 'Registro ou email já cadastrado.'
+                    });
+                }
+
                 return res.status(500).json({ erro: 'Erro ao atualizar profissional' });
+            }
+
+            if (results.affectedRows === 0) {
+                return res.status(404).json({ erro: 'Profissional não encontrado' });
             }
 
             res.status(200).json({ mensagem: 'Profissional atualizado com sucesso' });
@@ -114,9 +136,13 @@ function excluirProfissional(req, res) {
     connection.query(
         'delete from profissionais where id = ?',
         [id],
-        (err) => {
+        (err, results) => {
             if (err) {
                 return res.status(500).json({ erro: 'Erro ao excluir profissional' });
+            }
+
+            if (results.affectedRows === 0) {
+                return res.status(404).json({ erro: 'Profissional não encontrado' });
             }
 
             res.status(200).json({ mensagem: 'Profissional excluído com sucesso' });

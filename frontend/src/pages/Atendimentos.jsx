@@ -68,8 +68,13 @@ function Atendimentos() {
     }
 
     async function carregarProfissionais() {
-        const response = await api.get('/profissionais');
-        setProfissionais(response.data);
+    const response = await api.get('/profissionais');
+
+    const profissionaisAtivos = response.data.filter((profissional) => {
+        return Number(profissional.ativo) === 1;
+    });
+
+    setProfissionais(profissionaisAtivos);
     }
 
     function alterarCampo(e) {
@@ -146,28 +151,20 @@ function Atendimentos() {
     }
 
     async function cancelarAtendimento(atendimento) {
-        if (!window.confirm('Deseja realmente cancelar este atendimento?')) {
-            return;
-        }
-
-        try {
-            await api.put(`/atendimentos/${atendimento.id}`, {
-                paciente_id: atendimento.paciente_id,
-                profissional_id: atendimento.profissional_id,
-                data_hora: atendimento.data_hora,
-                tipo: atendimento.tipo,
-                status: 'Cancelado',
-                diagnostico: atendimento.diagnostico,
-                observacoes: atendimento.observacoes,
-                valor: atendimento.valor
-            });
-
-            setMensagem('Atendimento cancelado com sucesso!');
-            carregarAtendimentos();
-        } catch {
-            setMensagem('Erro ao cancelar atendimento.');
-        }
+    if (!window.confirm('Deseja realmente cancelar este atendimento?')) {
+        return;
     }
+
+    try {
+        await api.delete(`/atendimentos/${atendimento.id}`);
+
+        setMensagem('Atendimento cancelado com sucesso!');
+        carregarAtendimentos();
+    } catch (error) {
+        console.log(error);
+        setMensagem('Erro ao cancelar atendimento.');
+    }
+}
 
     function verDetalhes(atendimento) {
         setDetalhes(atendimento);

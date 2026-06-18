@@ -99,8 +99,11 @@ A aplicação foi desenvolvida utilizando React no frontend, Node.js e Express n
 * Filtro por status
 * Visualização de detalhes
 * Relacionamento entre paciente e profissional
+* Cadastro permitido apenas com profissionais ativos
 
-No frontend, o atendimento não é removido diretamente da listagem ao ser cancelado. O sistema altera o status do atendimento para `Cancelado`, mantendo o histórico registrado.
+No frontend, apenas profissionais ativos aparecem como opção para cadastro de atendimentos.
+
+O atendimento não é excluído fisicamente do banco de dados ao ser cancelado. O sistema realiza um cancelamento lógico, alterando o status do atendimento para `Cancelado`, mantendo o histórico registrado.
 
 ---
 
@@ -379,6 +382,8 @@ PUT    /api/atendimentos/:id
 DELETE /api/atendimentos/:id
 ```
 
+Observação: a rota `DELETE /api/atendimentos/:id` é utilizada para realizar o cancelamento lógico do atendimento. Ela não remove o registro do banco de dados, apenas altera o status para `Cancelado`.
+
 ### Filtros de Atendimentos
 
 Filtrar por data:
@@ -469,6 +474,8 @@ POST /api/atendimentos
 }
 ```
 
+Observação: o cadastro de atendimento só será permitido se o profissional informado estiver ativo.
+
 ---
 
 ## Testando a API
@@ -518,6 +525,8 @@ Explicação:
 * O backend precisa estar rodando para que o frontend consiga buscar e salvar dados.
 * O frontend consome a API através do Axios.
 * O banco utilizado é o MySQL.
+* Atendimentos só podem ser cadastrados com profissionais ativos.
+* O cancelamento de atendimento é feito por alteração de status, preservando o histórico no banco de dados.
 
 ---
 
