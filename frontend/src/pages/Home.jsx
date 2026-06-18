@@ -9,11 +9,22 @@ function Home() {
 
     useEffect(() => {
         carregarDados();
+
+        window.addEventListener('focus', carregarDados);
+
+        return () => {
+            window.removeEventListener('focus', carregarDados);
+        };
     }, []);
 
     function dataHoje() {
         const hoje = new Date();
-        return hoje.toISOString().split('T')[0];
+
+        const ano = hoje.getFullYear();
+        const mes = String(hoje.getMonth() + 1).padStart(2, '0');
+        const dia = String(hoje.getDate()).padStart(2, '0');
+
+        return `${ano}-${mes}-${dia}`;
     }
 
     async function carregarDados() {
@@ -27,13 +38,13 @@ function Home() {
             setPacientes(pacientesResponse.data.length);
 
             const ativos = profissionaisResponse.data.filter((profissional) => {
-                return profissional.ativo === 1 || profissional.ativo === true;
+                return Number(profissional.ativo) === 1;
             });
 
             setProfissionaisAtivos(ativos.length);
             setAtendimentosHoje(atendimentosResponse.data.length);
         } catch (error) {
-            console.log('Erro ao carregar dashboard', error);
+            console.log(error);
         }
 
         setCarregando(false);
@@ -41,10 +52,16 @@ function Home() {
 
     return (
         <div className="container mt-4">
-            <h1 className="page-title">Início</h1>
-            <p className="page-subtitle">
-                Visão geral do sistema hospitalar
-            </p>
+            <div className="page-header">
+                <div>
+                    <h1 className="page-title">Início</h1>
+                    <p className="page-subtitle">Visão geral do sistema hospitalar</p>
+                </div>
+
+                <button className="btn btn-primary" onClick={carregarDados}>
+                    Atualizar
+                </button>
+            </div>
 
             {carregando ? (
                 <p>Carregando...</p>
