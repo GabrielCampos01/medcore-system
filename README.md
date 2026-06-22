@@ -60,6 +60,7 @@ A aplicação foi desenvolvida utilizando React no frontend, Node.js e Express n
 * Total de pacientes cadastrados
 * Total de profissionais ativos
 * Total de atendimentos do dia
+* Atualização dos dados do painel conforme os registros cadastrados no sistema
 
 ### Pacientes
 
@@ -67,9 +68,13 @@ A aplicação foi desenvolvida utilizando React no frontend, Node.js e Express n
 * Listagem de pacientes
 * Busca por nome ou CPF
 * Edição de dados
-* Exclusão de pacientes
+* Desativação lógica de pacientes
+* Reativação de pacientes inativos
+* Filtro de pacientes por situação: ativos, inativos ou todos
 * Validação de CPF único
 * Validação de e-mail único
+
+No sistema, pacientes não são excluídos fisicamente do banco de dados. Ao acionar a opção de desativação, o paciente permanece registrado, mas passa a ficar com o status inativo. Também é possível consultar pacientes inativos e reativá-los quando necessário.
 
 ### Profissionais
 
@@ -80,6 +85,7 @@ A aplicação foi desenvolvida utilizando React no frontend, Node.js e Express n
 * Relacionamento com especialidades
 * Validação de registro profissional único
 * Validação de e-mail único
+* Controle de profissionais ativos e inativos
 
 ### Especialidades
 
@@ -346,11 +352,18 @@ http://localhost:5173
 
 ```http
 GET    /api/pacientes
+GET    /api/pacientes?ativo=true
+GET    /api/pacientes?ativo=false
 GET    /api/pacientes/:id
 POST   /api/pacientes
 PUT    /api/pacientes/:id
+PUT    /api/pacientes/:id/ativar
 DELETE /api/pacientes/:id
 ```
+
+Observação: a rota `DELETE /api/pacientes/:id` é utilizada para realizar a desativação lógica do paciente. Ela não remove o registro do banco de dados, apenas altera o status do paciente para inativo.
+
+A rota `PUT /api/pacientes/:id/ativar` permite reativar um paciente previamente desativado.
 
 ### Profissionais
 
@@ -422,6 +435,14 @@ POST /api/pacientes
 }
 ```
 
+### Reativação de Paciente
+
+```http
+PUT /api/pacientes/1/ativar
+```
+
+Essa rota altera o paciente informado para ativo novamente.
+
 ### Cadastro de Especialidade
 
 ```http
@@ -431,7 +452,7 @@ POST /api/especialidades
 ```json
 {
   "nome": "Cardiologia",
-  "descricao": "Especialidade relacionada ao coração",
+  "descricao": "Especialidade voltada ao diagnóstico e tratamento de doenças do coração e do sistema cardiovascular.",
   "area": "Clínica Médica"
 }
 ```
@@ -525,6 +546,9 @@ Explicação:
 * O backend precisa estar rodando para que o frontend consiga buscar e salvar dados.
 * O frontend consome a API através do Axios.
 * O banco utilizado é o MySQL.
+* Pacientes podem ser filtrados por situação: ativos, inativos ou todos.
+* Pacientes não são excluídos fisicamente; o sistema realiza desativação lógica.
+* Pacientes inativos podem ser reativados pelo sistema.
 * Atendimentos só podem ser cadastrados com profissionais ativos.
 * O cancelamento de atendimento é feito por alteração de status, preservando o histórico no banco de dados.
 
