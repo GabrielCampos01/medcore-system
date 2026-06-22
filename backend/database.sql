@@ -32,7 +32,8 @@ create table pacientes (
     email varchar(100) unique,
     endereco varchar(255),
     convenio varchar(100),
-    numero_carteirinha varchar(50)
+    numero_carteirinha varchar(50),
+    ativo boolean default true
 );
 
 create table atendimentos (

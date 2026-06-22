@@ -6,7 +6,8 @@ const {
     buscarPacientePorId,
     cadastrarPaciente,
     atualizarPaciente,
-    excluirPaciente
+    excluirPaciente,
+    ativarPaciente
 } = require('../controllers/pacienteController');
 
 router.get('/', listarPacientes);
@@ -14,5 +15,6 @@ router.get('/:id', buscarPacientePorId);
 router.post('/', cadastrarPaciente);
 router.put('/:id', atualizarPaciente);
 router.delete('/:id', excluirPaciente);
+router.put('/:id/ativar', ativarPaciente);
 
 module.exports = router;

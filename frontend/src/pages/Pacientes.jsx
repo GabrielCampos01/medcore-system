@@ -7,6 +7,7 @@ function Pacientes() {
     const [mensagem, setMensagem] = useState('');
     const [carregando, setCarregando] = useState(false);
     const [editandoId, setEditandoId] = useState(null);
+    const [filtroAtivo, setFiltroAtivo] = useState('true');
 
     const [form, setForm] = useState({
         nome_completo: '',
@@ -22,13 +23,23 @@ function Pacientes() {
 
     useEffect(() => {
         carregarPacientes();
-    }, []);
+    }, [filtroAtivo]);
 
     async function carregarPacientes() {
         setCarregando(true);
 
         try {
-            const response = await api.get('/pacientes');
+            let url = '/pacientes';
+
+            if (filtroAtivo === 'true') {
+                url = '/pacientes?ativo=true';
+            }
+
+            if (filtroAtivo === 'false') {
+                url = '/pacientes?ativo=false';
+            }
+
+            const response = await api.get(url);
             setPacientes(response.data);
         } catch {
             setMensagem('Erro ao carregar pacientes.');
@@ -43,6 +54,15 @@ function Pacientes() {
             [e.target.name]: e.target.value
         });
     }
+
+    const pacientesFiltrados = pacientes.filter((paciente) => {
+        const textoBusca = busca.toLowerCase();
+
+        return (
+            paciente.nome_completo?.toLowerCase().includes(textoBusca) ||
+            paciente.cpf?.toLowerCase().includes(textoBusca)
+        );
+    });
 
     async function salvarPaciente(e) {
         e.preventDefault();
@@ -100,29 +120,36 @@ function Pacientes() {
         });
     }
 
-    async function excluirPaciente(id) {
-        if (!window.confirm('Deseja realmente excluir este paciente?')) {
+    async function desativarPaciente(id) {
+        if (!window.confirm('Deseja realmente desativar este paciente?')) {
             return;
         }
 
         try {
             await api.delete(`/pacientes/${id}`);
-            setMensagem('Paciente excluído com sucesso!');
+            setMensagem('Paciente desativado com sucesso!');
             carregarPacientes();
         } catch {
-            setMensagem('Erro ao excluir paciente.');
+            setMensagem('Erro ao desativar paciente.');
         }
     }
 
-    const pacientesFiltrados = pacientes.filter((paciente) => {
-        return (
-            paciente.nome_completo?.toLowerCase().includes(busca.toLowerCase()) ||
-            paciente.cpf?.includes(busca)
-        );
-    });
+    async function ativarPaciente(id) {
+        if (!window.confirm('Deseja realmente ativar este paciente novamente?')) {
+            return;
+        }
+
+        try {
+            await api.put(`/pacientes/${id}/ativar`);
+            setMensagem('Paciente ativado com sucesso!');
+            carregarPacientes();
+        } catch {
+            setMensagem('Erro ao ativar paciente.');
+        }
+    }
 
     return (
-        <div className="container-fluid">
+        <div className="container mt-4">
             <div className="page-header">
                 <div>
                     <h1 className="page-title">Pacientes</h1>
@@ -142,22 +169,43 @@ function Pacientes() {
                         <div className="row">
                             <div className="col-md-4 mb-3">
                                 <label className="form-label">Nome completo</label>
-                                <input name="nome_completo" className="form-control" value={form.nome_completo} onChange={alterarCampo} />
+                                <input
+                                    name="nome_completo"
+                                    className="form-control"
+                                    value={form.nome_completo}
+                                    onChange={alterarCampo}
+                                />
                             </div>
 
                             <div className="col-md-2 mb-3">
                                 <label className="form-label">CPF</label>
-                                <input name="cpf" className="form-control" value={form.cpf} onChange={alterarCampo} />
+                                <input
+                                    name="cpf"
+                                    className="form-control"
+                                    value={form.cpf}
+                                    onChange={alterarCampo}
+                                />
                             </div>
 
                             <div className="col-md-2 mb-3">
                                 <label className="form-label">Nascimento</label>
-                                <input type="date" name="data_nascimento" className="form-control" value={form.data_nascimento} onChange={alterarCampo} />
+                                <input
+                                    type="date"
+                                    name="data_nascimento"
+                                    className="form-control"
+                                    value={form.data_nascimento}
+                                    onChange={alterarCampo}
+                                />
                             </div>
 
                             <div className="col-md-2 mb-3">
                                 <label className="form-label">Sexo</label>
-                                <select name="sexo" className="form-select" value={form.sexo} onChange={alterarCampo}>
+                                <select
+                                    name="sexo"
+                                    className="form-select"
+                                    value={form.sexo}
+                                    onChange={alterarCampo}
+                                >
                                     <option value="">Selecione</option>
                                     <option value="Masculino">Masculino</option>
                                     <option value="Feminino">Feminino</option>
@@ -167,27 +215,53 @@ function Pacientes() {
 
                             <div className="col-md-2 mb-3">
                                 <label className="form-label">Telefone</label>
-                                <input name="telefone" className="form-control" value={form.telefone} onChange={alterarCampo} />
+                                <input
+                                    name="telefone"
+                                    className="form-control"
+                                    value={form.telefone}
+                                    onChange={alterarCampo}
+                                />
                             </div>
 
                             <div className="col-md-4 mb-3">
                                 <label className="form-label">Email</label>
-                                <input type="email" name="email" className="form-control" value={form.email} onChange={alterarCampo} />
+                                <input
+                                    type="email"
+                                    name="email"
+                                    className="form-control"
+                                    value={form.email}
+                                    onChange={alterarCampo}
+                                />
                             </div>
 
                             <div className="col-md-4 mb-3">
                                 <label className="form-label">Endereço</label>
-                                <input name="endereco" className="form-control" value={form.endereco} onChange={alterarCampo} />
+                                <input
+                                    name="endereco"
+                                    className="form-control"
+                                    value={form.endereco}
+                                    onChange={alterarCampo}
+                                />
                             </div>
 
                             <div className="col-md-2 mb-3">
                                 <label className="form-label">Convênio</label>
-                                <input name="convenio" className="form-control" value={form.convenio} onChange={alterarCampo} />
+                                <input
+                                    name="convenio"
+                                    className="form-control"
+                                    value={form.convenio}
+                                    onChange={alterarCampo}
+                                />
                             </div>
 
                             <div className="col-md-2 mb-3">
                                 <label className="form-label">Carteirinha</label>
-                                <input name="numero_carteirinha" className="form-control" value={form.numero_carteirinha} onChange={alterarCampo} />
+                                <input
+                                    name="numero_carteirinha"
+                                    className="form-control"
+                                    value={form.numero_carteirinha}
+                                    onChange={alterarCampo}
+                                />
                             </div>
                         </div>
 
@@ -196,7 +270,11 @@ function Pacientes() {
                         </button>
 
                         {editandoId && (
-                            <button type="button" className="btn btn-secondary" onClick={limparFormulario}>
+                            <button
+                                type="button"
+                                className="btn btn-secondary"
+                                onClick={limparFormulario}
+                            >
                                 Cancelar
                             </button>
                         )}
@@ -204,21 +282,43 @@ function Pacientes() {
                 </div>
             </div>
 
-            <div className="content-card mb-4">
-                <div className="toolbar">
-                    <input
-                        className="form-control"
-                        value={busca}
-                        onChange={(e) => setBusca(e.target.value)}
-                        placeholder="Buscar paciente por nome ou CPF..."
-                    />
+            <div className="card mb-4">
+                <div className="card-body">
+                    <h5>Filtros</h5>
 
-                    <button
-                        className="btn btn-outline-secondary"
-                        onClick={() => setBusca('')}
-                    >
-                        Limpar
-                    </button>
+                    <div className="row">
+                        <div className="col-md-4 mb-3">
+                            <label className="form-label">Situação</label>
+                            <select
+                                className="form-select"
+                                value={filtroAtivo}
+                                onChange={(e) => setFiltroAtivo(e.target.value)}
+                            >
+                                <option value="true">Ativos</option>
+                                <option value="false">Inativos</option>
+                                <option value="todos">Todos</option>
+                            </select>
+                        </div>
+
+                        <div className="col-md-8 mb-3">
+                            <label className="form-label">Busca</label>
+                            <div className="d-flex gap-2">
+                                <input
+                                    className="form-control"
+                                    value={busca}
+                                    onChange={(e) => setBusca(e.target.value)}
+                                    placeholder="Buscar paciente por nome ou CPF..."
+                                />
+
+                                <button
+                                    className="btn btn-outline-secondary"
+                                    onClick={() => setBusca('')}
+                                >
+                                    Limpar
+                                </button>
+                            </div>
+                        </div>
+                    </div>
                 </div>
             </div>
 
@@ -235,6 +335,7 @@ function Pacientes() {
                                 <th>Telefone</th>
                                 <th>Email</th>
                                 <th>Convênio</th>
+                                <th>Status</th>
                                 <th>Ações</th>
                             </tr>
                         </thead>
@@ -249,6 +350,9 @@ function Pacientes() {
                                     <td>{paciente.email}</td>
                                     <td>{paciente.convenio}</td>
                                     <td>
+                                        {Number(paciente.ativo) === 1 ? 'Ativo' : 'Inativo'}
+                                    </td>
+                                    <td>
                                         <button
                                             className="btn btn-outline-primary btn-sm me-2"
                                             title="Editar"
@@ -257,13 +361,23 @@ function Pacientes() {
                                             <i className="bi bi-pencil"></i>
                                         </button>
 
-                                        <button
-                                            className="btn btn-outline-danger btn-sm"
-                                            title="Excluir"
-                                            onClick={() => excluirPaciente(paciente.id)}
-                                        >
-                                            <i className="bi bi-trash"></i>
-                                        </button>
+                                        {Number(paciente.ativo) === 1 ? (
+                                            <button
+                                                className="btn btn-outline-danger btn-sm"
+                                                title="Desativar"
+                                                onClick={() => desativarPaciente(paciente.id)}
+                                            >
+                                                <i className="bi bi-x-circle"></i>
+                                            </button>
+                                        ) : (
+                                            <button
+                                                className="btn btn-outline-success btn-sm"
+                                                title="Ativar"
+                                                onClick={() => ativarPaciente(paciente.id)}
+                                            >
+                                                <i className="bi bi-check-circle"></i>
+                                            </button>
+                                        )}
                                     </td>
                                 </tr>
                             ))}
