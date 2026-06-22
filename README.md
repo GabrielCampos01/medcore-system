@@ -244,7 +244,7 @@ Exemplo:
 ```env
 DB_HOST=localhost
 DB_USER=usuario
-DB_PASSWORD=usuario
+DB_PASSWORD=senha123
 DB_NAME=medcore
 DB_PORT=3306
 PORT=3000
