@@ -132,8 +132,6 @@ medcore-system/
 └── README.md
 ```
 
-Observação: caso a pasta do frontend esteja com outro nome no repositório, como `front-end`, utilize esse mesmo nome nos comandos.
-
 ---
 
 ## Como Clonar o Projeto
