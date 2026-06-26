@@ -9,12 +9,24 @@ function normalizarAtivo(ativo) {
 }
 
 function listarProfissionais(req, res) {
-    connection.query(`
+    const { ativo } = req.query;
+
+    let sql = `
         select profissionais.*, especialidades.nome as especialidade
         from profissionais
         left join especialidades
             on profissionais.especialidade_id = especialidades.id
-    `, (err, results) => {
+    `;
+
+    if (ativo === 'true') {
+        sql += ' where profissionais.ativo = true';
+    }
+
+    if (ativo === 'false') {
+        sql += ' where profissionais.ativo = false';
+    }
+
+    connection.query(sql, (err, results) => {
         if (err) {
             return res.status(500).json({ erro: 'Erro ao listar profissionais' });
         }
@@ -133,21 +145,45 @@ function atualizarProfissional(req, res) {
 function excluirProfissional(req, res) {
     const { id } = req.params;
 
-    connection.query(
-        'delete from profissionais where id = ?',
-        [id],
-        (err, results) => {
-            if (err) {
-                return res.status(500).json({ erro: 'Erro ao excluir profissional' });
-            }
+    const sql = `
+        update profissionais
+        set ativo = false
+        where id = ?
+    `;
 
-            if (results.affectedRows === 0) {
-                return res.status(404).json({ erro: 'Profissional não encontrado' });
-            }
-
-            res.status(200).json({ mensagem: 'Profissional excluído com sucesso' });
+    connection.query(sql, [id], (err, results) => {
+        if (err) {
+            return res.status(500).json({ erro: 'Erro ao desativar profissional' });
         }
-    );
+
+        if (results.affectedRows === 0) {
+            return res.status(404).json({ erro: 'Profissional não encontrado' });
+        }
+
+        res.status(200).json({ mensagem: 'Profissional desativado com sucesso' });
+    });
+}
+
+function ativarProfissional(req, res) {
+    const { id } = req.params;
+
+    const sql = `
+        update profissionais
+        set ativo = true
+        where id = ?
+    `;
+
+    connection.query(sql, [id], (err, results) => {
+        if (err) {
+            return res.status(500).json({ erro: 'Erro ao ativar profissional' });
+        }
+
+        if (results.affectedRows === 0) {
+            return res.status(404).json({ erro: 'Profissional não encontrado' });
+        }
+
+        res.status(200).json({ mensagem: 'Profissional ativado com sucesso' });
+    });
 }
 
 module.exports = {
@@ -155,5 +191,6 @@ module.exports = {
     buscarProfissionalPorId,
     cadastrarProfissional,
     atualizarProfissional,
-    excluirProfissional
+    excluirProfissional,
+    ativarProfissional
 };
